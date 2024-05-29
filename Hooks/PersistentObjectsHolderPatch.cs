@@ -15,7 +15,7 @@ public class PersistentObjectsHolderPatch
     private static void PersistentObjectsHolder_FindPersistantObjects(On.PersistentObjectsHolder.orig_FindPersistantObjects orig, PersistentObjectsHolder self)
     {
         var existingCamerasUnderground = FindVideoCamerasInSet(self.m_PersistentObjects);
-        
+
         orig(self);
 
         if (!MyceliumNetwork.IsHost)
@@ -25,7 +25,7 @@ public class PersistentObjectsHolderPatch
 
         // only continue if this is the host
 
-        KeepCameraAfterDeath.Logger.LogInfo("ALEX: search for cameras underground");
+        KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: search for cameras underground");
 
         var numObjects = self.m_PersistentObjects.Count;
 
@@ -45,7 +45,7 @@ public class PersistentObjectsHolderPatch
                     continue;
                 }
 
-                KeepCameraAfterDeath.Logger.LogInfo("ALEX: found a camera");
+                KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: found a camera");
                 KeepCameraAfterDeath.Instance.SetPreservedCameraInstanceDataForHost(objectInstanceData);
 
                 // We don't want to leave a clone of the camera underground when we are gonna make a new one on the surface.

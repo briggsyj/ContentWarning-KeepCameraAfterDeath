@@ -16,7 +16,7 @@ public class SurfaceNetworkHandlerPatch
         // Clear data when entering new lobby
         if (SurfaceNetworkHandler.RoomStats == null)
         {
-            KeepCameraAfterDeath.Logger.LogInfo("ALEX: new lobby");
+            KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: new lobby");
             KeepCameraAfterDeath.Instance.ClearData();
         }
 
@@ -24,17 +24,17 @@ public class SurfaceNetworkHandlerPatch
         // Set if camera was brought home
         if (MyceliumNetwork.IsHost && TimeOfDayHandler.TimeOfDay == TimeOfDay.Evening)
         {
-            KeepCameraAfterDeath.Logger.LogInfo("ALEX: is evening");
-            
+            KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: is evening");
+
             if (KeepCameraAfterDeath.Instance.PreservedCameraInstanceDataForHost != null)
             {
-                KeepCameraAfterDeath.Logger.LogInfo("ALEX: respawn camera");
+                KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: respawn camera");
                 self.m_VideoCameraSpawner.SpawnMe(force: true);
             }
             else
             {
                 // only reward players if they do not leave any cameras behind
-                KeepCameraAfterDeath.Logger.LogInfo("ALEX: brought camera home");
+                KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: brought camera home");
                 // use host settings to set rewards
                 if (KeepCameraAfterDeath.Instance.PlayerSettingEnableRewardForCameraReturn)
                 {

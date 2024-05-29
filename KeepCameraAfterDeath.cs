@@ -17,9 +17,9 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
     public static KeepCameraAfterDeath Instance { get; private set; } = null!;
     internal new static ManualLogSource Logger { get; private set; } = null!;
 
-    public bool PlayerSettingEnableRewardForCameraReturn { get; private set; }
-    public int PlayerSettingMetaCoinReward { get; private set; }
-    public int PlayerSettingCashReward { get; private set; }
+    public bool PlayerSettingEnableRewardForCameraReturn { get; set; }
+    public int PlayerSettingMetaCoinReward { get; set; }
+    public int PlayerSettingCashReward { get; set; }
 
     public ItemInstanceData? PreservedCameraInstanceDataForHost { get; private set; } = null;
     public (int cash, int mc)? PendingRewardForCameraReturn { get; private set; } = null;
@@ -31,7 +31,7 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
 
         HookAll();
 
-        Logger.LogInfo($"{"alexandria-p.KeepCameraAfterDeath"} v{"1.0.0"} has loaded!");
+        Logger.LogInfo($"{"CAD-MOD.KeepCameraAfterDeath"} v{"1.0.0"} has loaded!");
 
     }
 
@@ -39,14 +39,14 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
     {
         MyceliumNetwork.RegisterNetworkObject(Instance, myceliumNetworkModId);
 
-        Logger.LogInfo($"ALEX: mycelium network object registered");
+        Logger.LogInfo($"CAD-MOD: mycelium network object registered");
     }
 
     void OnDestroy()
     {
         MyceliumNetwork.DeregisterNetworkObject(Instance, myceliumNetworkModId);
 
-        Logger.LogInfo($"ALEX: mycelium network object destroyed");
+        Logger.LogInfo($"CAD-MOD: mycelium network object destroyed");
     }
 
     internal static void HookAll()
@@ -62,31 +62,16 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
         HookEndpointManager.RemoveAllOwnedBy(Assembly.GetExecutingAssembly());
     }
 
-    public void SetPlayerSettingEnableRewardForCameraReturn(bool rewardEnabled)
-    {
-        PlayerSettingEnableRewardForCameraReturn = rewardEnabled;
-    }
-
-    public void SetPlayerSettingMetaCoinReward(int mcReward)
-    {
-        PlayerSettingMetaCoinReward = mcReward;
-    }
-
-    public void SetPlayerSettingCashReward(int cashReward)
-    {
-        PlayerSettingCashReward = cashReward;
-    }
-
     public void SetPreservedCameraInstanceDataForHost(ItemInstanceData data)
     {
         //data.TryGetEntry<VideoInfoEntry>(out VideoInfoEntry t);
-        //KeepCameraAfterDeath.Logger.LogInfo("ALEX: SET PRESERVED CAMERA DATA video ID: " + t != null ? t.videoID.id : "NONE");
+        //KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: SET PRESERVED CAMERA DATA video ID: " + t != null ? t.videoID.id : "NONE");
         PreservedCameraInstanceDataForHost = data;
     }
 
     public void ClearPreservedCameraInstanceData()
     {
-        Logger.LogInfo("ALEX: clear preserved camera data");
+        Logger.LogInfo("CAD-MOD: clear preserved camera data");
         PreservedCameraInstanceDataForHost = null;
     }
 
@@ -97,7 +82,7 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
             return;
         }
 
-        Logger.LogInfo("ALEX: host will try set rewards for players using RPC");
+        Logger.LogInfo("CAD-MOD: host will try set rewards for players using RPC");
 
         // send out host's setting for rewards to all players
         MyceliumNetwork.RPC(myceliumNetworkModId, nameof(RPC_SetPendingRewardForCameraReturn), ReliableType.Reliable, PlayerSettingCashReward, PlayerSettingMetaCoinReward);
@@ -106,13 +91,13 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
     [CustomRPC]
     public void RPC_SetPendingRewardForCameraReturn(int cash, int mc)
     {
-        KeepCameraAfterDeath.Logger.LogInfo("ALEX: commanded by host to set reward for camera return: $" + cash + " and " + mc + "MC");
+        KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: commanded by host to set reward for camera return: $" + cash + " and " + mc + "MC");
         PendingRewardForCameraReturn = (cash, mc);
     }
 
     public void ClearPendingRewardForCameraReturn()
     {
-        KeepCameraAfterDeath.Logger.LogInfo("ALEX: clear pending reward");
+        KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: clear pending reward");
         PendingRewardForCameraReturn = null;
     }
 
@@ -123,7 +108,7 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
             return;
         }
 
-        Logger.LogInfo("ALEX: try clear day's data for players using RPC");
+        Logger.LogInfo("CAD-MOD: try clear day's data for players using RPC");
 
         MyceliumNetwork.RPC(myceliumNetworkModId, nameof(RPC_ResetDataforDay), ReliableType.Reliable);
     }
@@ -133,7 +118,7 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
     {
         // Clear any camera film that was preserved from the lost world on the previous day
         // Clear pending rewards for camera return
-        KeepCameraAfterDeath.Logger.LogInfo("ALEX: commanded by host to clear today's data");
+        KeepCameraAfterDeath.Logger.LogInfo("CAD-MOD: commanded by host to clear today's data");
         KeepCameraAfterDeath.Instance.ClearData();
     }
 
@@ -151,7 +136,7 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
         public override void ApplyValue()
         {
             //KeepCameraAfterDeath.Logger.LogInfo($"MC Reward for camera return: {Value}");
-            KeepCameraAfterDeath.Instance.SetPlayerSettingEnableRewardForCameraReturn(Value);
+            KeepCameraAfterDeath.Instance.PlayerSettingEnableRewardForCameraReturn = Value;
         }
 
         public string GetDisplayName() => "Turn on incentives for bringing the camera back to the surface (uses the host's game settings)";
@@ -165,7 +150,7 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
         public override void ApplyValue()
         {
             //KeepCameraAfterDeath.Logger.LogInfo($"Meta Coin (MC) reward for camera return: {Value}");
-            KeepCameraAfterDeath.Instance.SetPlayerSettingMetaCoinReward(Value);
+            KeepCameraAfterDeath.Instance.PlayerSettingMetaCoinReward = Value;
         }
 
         public string GetDisplayName() => "Meta Coin (MC) reward for camera return (uses the host's game settings)";
@@ -181,7 +166,7 @@ public class KeepCameraAfterDeath : BaseUnityPlugin
         public override void ApplyValue()
         {
             //KeepCameraAfterDeath.Logger.LogInfo($"Cash reward for camera return: {Value}");
-            KeepCameraAfterDeath.Instance.SetPlayerSettingCashReward(Value);
+            KeepCameraAfterDeath.Instance.PlayerSettingCashReward = Value;
         }
 
         public string GetDisplayName() => "Cash reward for camera return (uses the host's game settings)";
